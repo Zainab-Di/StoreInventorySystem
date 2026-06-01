@@ -99,18 +99,20 @@
             // 
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label3.Location = new Point(722, 164);
+            label3.Location = new Point(717, 164);
             label3.Name = "label3";
-            label3.Size = new Size(63, 28);
+            label3.Size = new Size(74, 28);
             label3.TabIndex = 4;
-            label3.Text = "الكمية";
+            label3.Text = ": الكمية";
             // 
             // textBox1
             // 
+            textBox1.BackColor = SystemColors.ControlLightLight;
             textBox1.Location = new Point(591, 165);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(125, 27);
             textBox1.TabIndex = 5;
+            textBox1.TextChanged += textBox1_TextChanged;
             // 
             // button2
             // 
@@ -123,6 +125,7 @@
             button2.TabIndex = 6;
             button2.Text = "تنفيذ الحركة";
             button2.UseVisualStyleBackColor = false;
+            button2.Click += button2_Click;
             // 
             // dataGridView1
             // 
