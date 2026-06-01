@@ -92,5 +92,16 @@ namespace StoreInventorySystem
         {
 
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+
+            // إنشاء نسخة من شاشتكِ الجديدة
+            stockMovementFrom stockForm = new stockMovementFrom();
+            this.Hide();
+            // أمر فتح الشاشة الجديدة فوق الشاشة الرئيسية
+            stockForm.ShowDialog();
+        
+    }
     }
 }

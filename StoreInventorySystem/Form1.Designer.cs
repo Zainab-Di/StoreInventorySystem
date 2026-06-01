@@ -105,6 +105,7 @@
             button3.TabIndex = 2;
             button3.Text = "حركة المخزن";
             button3.UseVisualStyleBackColor = false;
+            button3.Click += button3_Click;
             // 
             // panel1
             // 
@@ -119,7 +120,7 @@
             // 
             lblStatus.AutoSize = true;
             lblStatus.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lblStatus.Location = new Point(389, 6);
+            lblStatus.Location = new Point(281, 8);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(520, 23);
             lblStatus.TabIndex = 0;
