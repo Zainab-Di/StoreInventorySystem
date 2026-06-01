@@ -12,37 +12,54 @@ namespace StoreInventorySystem
         public MainForm()
         {
             InitializeComponent();
-       
+
 
             // الكود السحري لجعل حواف الأزرار دائرية وناعمة
             MakeButtonRounded(button1, 25);
             MakeButtonRounded(button2, 25);
             MakeButtonRounded(button3, 25);
-        
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            // هذا الكود يتأكد من أن الاتصال شغال تمام بمجرد فتح البرنامج
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    conn.Open();
-                    // يمكنك إلغاء هذه الرسالة لاحقاً، لكنها ممتازة الآن للتأكد من نجاح الربط عند التشغيل
-                    MessageBox.Show("تم الاتصال بنجاح بقاعدة البيانات المخصصة للمخزن!", "نجاح الربط", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("عذراً، فشل الاتصال بقاعدة البيانات: " + ex.Message, "خطأ في الاتصال", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
+            string connectionString = "Server=YOUR_SERVER; Database=StoreInventoryDB; Trusted_Connection=True;";
+
+
+
+
         }
 
         private void Form1_Load_1(object sender, EventArgs e)
         {
 
+            // 1. الأكواد للحواف الدائرية الخاصة بكِ
+            MakeButtonRounded(button1, 25);
+            MakeButtonRounded(button2, 25);
+            MakeButtonRounded(button3, 25);
+
+            // 2. تعريف السلسلة واختبار الاتصال في نفس المكان
+            string connectionString = "Server=.; Database=StoreInventoryDB; Trusted_Connection=True;";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open(); // محاولة فتح الاتصال
+
+                    // إذا نجح الاتصال
+                    lblStatus.Text = "StoreInventoryDB:متصل بقاعدة البيانات بنجاح ";
+                    lblStatus.ForeColor = Color.Green;
+                }
+                catch (Exception ex)
+                {
+                    // إذا فشل الاتصال
+                    lblStatus.Text = "فشل الاتصال بقاعدة البيانات! يرجى التحقق من السيرفر.";
+                    lblStatus.ForeColor = Color.Red;
+                }
+            }
         }
+
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -69,6 +86,11 @@ namespace StoreInventorySystem
             edge.AddArc(0, btn.Height - borderRadius, borderRadius, borderRadius, 90, 90);
 
             btn.Region = new System.Drawing.Region(edge);
+        }
+
+        private void lblStatus_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

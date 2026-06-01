@@ -35,7 +35,7 @@
             button2 = new Button();
             button3 = new Button();
             panel1 = new Panel();
-            label1 = new Label();
+            lblStatus = new Label();
             panel2 = new Panel();
             label3 = new Label();
             label2 = new Label();
@@ -109,21 +109,22 @@
             // panel1
             // 
             panel1.BackColor = SystemColors.GradientInactiveCaption;
-            panel1.Controls.Add(label1);
+            panel1.Controls.Add(lblStatus);
             panel1.Location = new Point(-3, 410);
             panel1.Name = "panel1";
             panel1.Size = new Size(804, 37);
             panel1.TabIndex = 3;
             // 
-            // label1
+            // lblStatus
             // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label1.Location = new Point(443, 7);
-            label1.Name = "label1";
-            label1.Size = new Size(358, 23);
-            label1.TabIndex = 0;
-            label1.Text = "StoreInventoryDB :متصل بقاعدة البيانات بنجاح";
+            lblStatus.AutoSize = true;
+            lblStatus.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblStatus.Location = new Point(389, 6);
+            lblStatus.Name = "lblStatus";
+            lblStatus.Size = new Size(520, 23);
+            lblStatus.TabIndex = 0;
+            lblStatus.Text = "                                                                                 ...جاري الإتصال";
+            lblStatus.Click += lblStatus_Click;
             // 
             // panel2
             // 
@@ -184,7 +185,7 @@
         private Button button2;
         private Button button3;
         private Panel panel1;
-        private Label label1;
+        private Label lblStatus;
         private Panel panel2;
         private Label label2;
         private Label label3;
