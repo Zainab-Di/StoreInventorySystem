@@ -45,6 +45,8 @@ namespace StoreInventoryDBSystem
 
         private void button1_Click(object sender, EventArgs e)
         {
+            ProductsForm form = new ProductsForm();
+            form.Show();
             // كود زر إدارة المنتجات (يمكنكِ إضافة الأكواد هنا لاحقاً)
         }
 
