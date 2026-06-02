@@ -63,7 +63,8 @@ namespace StoreInventorySystem
 
         private void button1_Click(object sender, EventArgs e)
         {
-            
+            ProductsForm form = new ProductsForm();
+            form.Show();
         }
 
         private void panel2_Paint(object sender, PaintEventArgs e)

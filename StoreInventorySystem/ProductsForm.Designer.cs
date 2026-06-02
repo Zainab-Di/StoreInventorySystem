@@ -44,7 +44,9 @@
             label4 = new Label();
             label5 = new Label();
             button5 = new Button();
+            panel1 = new Panel();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
+            panel1.SuspendLayout();
             SuspendLayout();
             // 
             // textBox1
@@ -89,50 +91,58 @@
             // 
             // button1
             // 
+            button1.BackColor = Color.DarkBlue;
+            button1.ForeColor = SystemColors.ButtonHighlight;
             button1.Location = new Point(112, 304);
             button1.Name = "button1";
             button1.Size = new Size(91, 39);
             button1.TabIndex = 5;
             button1.Text = "حفظ";
-            button1.UseVisualStyleBackColor = true;
+            button1.UseVisualStyleBackColor = false;
             button1.Click += button1_Click;
             // 
             // button2
             // 
+            button2.BackColor = Color.DarkBlue;
+            button2.ForeColor = SystemColors.ButtonHighlight;
             button2.Location = new Point(288, 304);
             button2.Name = "button2";
             button2.Size = new Size(88, 39);
             button2.TabIndex = 6;
-            button2.Text = "حذف";
-            button2.UseVisualStyleBackColor = true;
+            button2.Text = "تعديل";
+            button2.UseVisualStyleBackColor = false;
             button2.Click += button2_Click;
             // 
             // button3
             // 
+            button3.BackColor = Color.DarkBlue;
+            button3.ForeColor = SystemColors.ButtonHighlight;
             button3.Location = new Point(112, 368);
             button3.Name = "button3";
             button3.Size = new Size(96, 39);
             button3.TabIndex = 7;
-            button3.Text = "تعديل";
-            button3.UseVisualStyleBackColor = true;
+            button3.Text = "حذف";
+            button3.UseVisualStyleBackColor = false;
             button3.Click += button3_Click;
             // 
             // button4
             // 
+            button4.BackColor = Color.DarkBlue;
+            button4.ForeColor = SystemColors.ButtonHighlight;
             button4.Location = new Point(288, 368);
             button4.Name = "button4";
             button4.Size = new Size(88, 40);
             button4.TabIndex = 8;
             button4.Text = "تنظيف";
-            button4.UseVisualStyleBackColor = true;
+            button4.UseVisualStyleBackColor = false;
             button4.Click += button4_Click;
             // 
             // dataGridView1
             // 
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Location = new Point(408, 64);
+            dataGridView1.Location = new Point(384, 64);
             dataGridView1.Name = "dataGridView1";
-            dataGridView1.Size = new Size(320, 248);
+            dataGridView1.Size = new Size(384, 224);
             dataGridView1.TabIndex = 9;
             dataGridView1.CellContentClick += dataGridView1_CellContentClick;
             // 
@@ -184,20 +194,31 @@
             // 
             // button5
             // 
-            button5.Location = new Point(24, 16);
+            button5.BackColor = Color.SteelBlue;
+            button5.ForeColor = SystemColors.ButtonHighlight;
+            button5.Location = new Point(8, 16);
             button5.Name = "button5";
             button5.Size = new Size(144, 23);
             button5.TabIndex = 15;
             button5.Text = "العودة للصفحة الرئيسية";
-            button5.UseVisualStyleBackColor = true;
+            button5.UseVisualStyleBackColor = false;
             button5.Click += button5_Click;
+            // 
+            // panel1
+            // 
+            panel1.BackColor = Color.DarkBlue;
+            panel1.Controls.Add(button5);
+            panel1.Location = new Point(0, 0);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(800, 48);
+            panel1.TabIndex = 16;
             // 
             // ProductsForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
-            Controls.Add(button5);
+            Controls.Add(panel1);
             Controls.Add(label5);
             Controls.Add(label4);
             Controls.Add(label3);
@@ -216,6 +237,7 @@
             Name = "ProductsForm";
             Text = "ProductsForm";
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
+            panel1.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -238,5 +260,6 @@
         private Label label4;
         private Label label5;
         private Button button5;
+        private Panel panel1;
     }
 }
