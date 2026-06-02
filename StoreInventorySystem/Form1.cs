@@ -8,8 +8,8 @@ namespace StoreInventoryDBSystem
 {
     public partial class MainForm : Form
     {
-        // 1. سلسلة الاتصال الصحيحة والنهائية الموجهة لجهاز ريان وقاعدتها
-        private string connectionString = @"Server=DESKTOP-IR0K6JE\SQLEXPRESS;Database=StoreInventoryDB;Trusted_Connection=True;TrustServerCertificate=True;Encrypt=false;";
+        // سلسلة الاتصال 
+        private string connectionString = @"Server=.;Database=StoreInventoryDB;Trusted_Connection=True;TrustServerCertificate=True;Encrypt=false;";
 
         public MainForm()
         {
@@ -46,6 +46,7 @@ namespace StoreInventoryDBSystem
         private void button1_Click(object sender, EventArgs e)
         {
             ProductsForm form = new ProductsForm();
+            this.Hide();
             form.Show();
             // كود زر إدارة المنتجات (يمكنكِ إضافة الأكواد هنا لاحقاً)
         }

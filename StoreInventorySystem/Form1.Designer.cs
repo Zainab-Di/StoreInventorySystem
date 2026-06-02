@@ -39,8 +39,10 @@
             panel2 = new Panel();
             label3 = new Label();
             label2 = new Label();
+            pictureBox1 = new PictureBox();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // button1
@@ -50,13 +52,13 @@
             button1.FlatAppearance.BorderSize = 2;
             button1.FlatAppearance.MouseDownBackColor = Color.White;
             button1.FlatStyle = FlatStyle.Flat;
-            button1.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            button1.Font = new Font("Segoe UI", 16F, FontStyle.Bold, GraphicsUnit.Point, 0);
             button1.ImageAlign = ContentAlignment.MiddleLeft;
             button1.ImageIndex = 1;
             button1.ImageList = imageList1;
-            button1.Location = new Point(48, 110);
+            button1.Location = new Point(539, 392);
             button1.Name = "button1";
-            button1.Size = new Size(280, 90);
+            button1.Size = new Size(354, 90);
             button1.TabIndex = 0;
             button1.Text = "إدارة المنتجات";
             button1.UseVisualStyleBackColor = false;
@@ -77,13 +79,13 @@
             button2.FlatAppearance.BorderColor = Color.FromArgb(128, 255, 128);
             button2.FlatAppearance.BorderSize = 2;
             button2.FlatStyle = FlatStyle.Flat;
-            button2.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            button2.Font = new Font("Segoe UI", 16F, FontStyle.Bold, GraphicsUnit.Point, 0);
             button2.ImageAlign = ContentAlignment.MiddleLeft;
             button2.ImageIndex = 2;
             button2.ImageList = imageList1;
-            button2.Location = new Point(479, 110);
+            button2.Location = new Point(539, 110);
             button2.Name = "button2";
-            button2.Size = new Size(280, 90);
+            button2.Size = new Size(354, 90);
             button2.TabIndex = 1;
             button2.Text = "إدارة الموردين";
             button2.UseVisualStyleBackColor = false;
@@ -95,13 +97,13 @@
             button3.FlatAppearance.BorderColor = Color.FromArgb(255, 128, 0);
             button3.FlatAppearance.BorderSize = 2;
             button3.FlatStyle = FlatStyle.Flat;
-            button3.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            button3.Font = new Font("Segoe UI", 16F, FontStyle.Bold, GraphicsUnit.Point, 0);
             button3.ImageAlign = ContentAlignment.MiddleLeft;
             button3.ImageIndex = 0;
             button3.ImageList = imageList1;
-            button3.Location = new Point(250, 250);
+            button3.Location = new Point(539, 246);
             button3.Name = "button3";
-            button3.Size = new Size(280, 90);
+            button3.Size = new Size(354, 90);
             button3.TabIndex = 2;
             button3.Text = "حركة المخزن";
             button3.UseVisualStyleBackColor = false;
@@ -111,16 +113,16 @@
             // 
             panel1.BackColor = SystemColors.GradientInactiveCaption;
             panel1.Controls.Add(lblStatus);
-            panel1.Location = new Point(-3, 410);
+            panel1.Location = new Point(-3, 563);
             panel1.Name = "panel1";
-            panel1.Size = new Size(804, 37);
+            panel1.Size = new Size(937, 37);
             panel1.TabIndex = 3;
             // 
             // lblStatus
             // 
             lblStatus.AutoSize = true;
             lblStatus.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lblStatus.Location = new Point(281, 8);
+            lblStatus.Location = new Point(194, 5);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(520, 23);
             lblStatus.TabIndex = 0;
@@ -134,7 +136,7 @@
             panel2.Controls.Add(label2);
             panel2.Location = new Point(-3, -4);
             panel2.Name = "panel2";
-            panel2.Size = new Size(804, 59);
+            panel2.Size = new Size(937, 59);
             panel2.TabIndex = 4;
             panel2.Paint += panel2_Paint;
             // 
@@ -143,9 +145,8 @@
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 18F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label3.ForeColor = Color.White;
-          //  label3.Image = Properties.Resources.box;
             label3.ImageAlign = ContentAlignment.MiddleLeft;
-            label3.Location = new Point(9, 11);
+            label3.Location = new Point(237, 13);
             label3.Name = "label3";
             label3.Size = new Size(695, 41);
             label3.TabIndex = 5;
@@ -160,16 +161,28 @@
             label2.Size = new Size(0, 20);
             label2.TabIndex = 0;
             // 
+            // pictureBox1
+            // 
+            pictureBox1.Image = StoreInventorySystem.Properties.Resources.supermaket;
+            pictureBox1.Location = new Point(38, 93);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(449, 400);
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox1.TabIndex = 5;
+            pictureBox1.TabStop = false;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 448);
+            ClientSize = new Size(923, 600);
             Controls.Add(panel2);
             Controls.Add(panel1);
             Controls.Add(button3);
             Controls.Add(button2);
             Controls.Add(button1);
+            Controls.Add(pictureBox1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "MainForm";
             Text = "الشاشة الرئسية ";
             Load += Form1_Load_1;
@@ -177,6 +190,7 @@
             panel1.PerformLayout();
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
         }
 
@@ -191,5 +205,6 @@
         private Label label2;
         private Label label3;
         private ImageList imageList1;
+        private PictureBox pictureBox1;
     }
 }

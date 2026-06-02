@@ -9,8 +9,7 @@ namespace StoreInventorySystem
     public partial class frmSuppliers : Form
     {
         // سلسلة الاتصال المباشرة بسيرفر ريان وقاعدتها الحالية
-        private string connectionString = @"Server=DESKTOP-IR0K6JE\SQLEXPRESS;Database=StoreInventoryDB;Trusted_Connection=True;TrustServerCertificate=True;Encrypt=false;";
-
+        private string connectionString = @"Server=.;Database=StoreInventoryDB;Trusted_Connection=True;TrustServerCertificate=True;Encrypt=false;";
         public frmSuppliers()
         {
             InitializeComponent();
@@ -39,6 +38,12 @@ namespace StoreInventorySystem
         private void frmSuppliers_Load(object sender, EventArgs e)
         {
             LoadSuppliers();
+            // تغيير النص الظاهر فقط في أعلى الجدول للمستخدم
+            dgvSuppliers.Columns["SupplierID"].HeaderText = "المعرف";
+            dgvSuppliers.Columns["SupplierName"].HeaderText = "اسم المورد";
+            dgvSuppliers.Columns["ContactPhone"].HeaderText = "رقم الهاتف";
+            dgvSuppliers.Columns["Email"].HeaderText = "البريد الإلكتروني";
+            dgvSuppliers.Columns["Address"].HeaderText = "العنوان";
         }
 
         // كود زر الحفظ (Save)
@@ -177,6 +182,36 @@ namespace StoreInventorySystem
             {
                 Application.OpenForms["MainForm"].Show();
             }
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dgvSuppliers_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtPhone_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void gbDetails_Enter(object sender, EventArgs e)
+        {
+
         }
     }
 }

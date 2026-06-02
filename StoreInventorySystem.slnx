@@ -6,7 +6,5 @@
   <Project Path="StoreInventorySystem/StoreInventorySystem.csproj">
     <Platform Solution="*|x64" Project="x64" />
   </Project>
-  <Project Path="StoreInventoryTest/StoreInventoryTest.csproj" Id="e05581ae-bb58-4225-b8bb-e838cbcb3e34">
-    <Platform Solution="*|x64" Project="x64" />
-  </Project>
+  <Project Path="Test_StoreInventorySystem/Test_StoreInventorySystem.csproj" Id="43d4c56f-2b9a-4296-9f41-5c2c8f51161a" />
 </Solution>

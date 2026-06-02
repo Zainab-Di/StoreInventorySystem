@@ -13,8 +13,7 @@ namespace StoreInventoryDBSystem
     public partial class stockMovementFrom : Form
     {
         // سلسلة الاتصال بالسيرفر المحلي الخاص بكِ
-        private string connectionString = @"Server=DESKTOP-IR0K6JE\SQLEXPRESS;Database=StoreInventoryDB;Trusted_Connection=True;TrustServerCertificate=True;Encrypt=false;";
-        public stockMovementFrom()
+        private string connectionString = @"Server=.;Database=StoreInventoryDB;Trusted_Connection=True;TrustServerCertificate=True;Encrypt=false;"; public stockMovementFrom()
         {
             InitializeComponent();
         }
@@ -36,7 +35,27 @@ namespace StoreInventoryDBSystem
         {
             // تشغيل دالة جلب البيانات لتعبئة الجدول والقائمة فور إقلاع الشاشة
             RefreshData();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = "SELECT SupplierID, SupplierName FROM Suppliers";
+                    SqlDataAdapter da = new SqlDataAdapter(query, conn);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+
+                    combsuppliers.DataSource = dt;
+                    combsuppliers.DisplayMember = "SupplierName"; // الاسم الذي يظهر للمستخدم
+                    combsuppliers.ValueMember = "SupplierID";     // المعرف المخفي برمجياً
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("خطأ في جلب الموردين: " + ex.Message);
+            }
         }
+        
 
         // دالة مخصصة لقراءة البيانات وتحديثها في الشاشة في أي وقت
         private void RefreshData()
@@ -83,8 +102,8 @@ namespace StoreInventoryDBSystem
         {
 
             // 1. التحقق من إدخال كمية صحيحة
-            if (string.IsNullOrEmpty(textBox1.Text)||!int.TryParse(textBox1.Text, out int enteredQuantity) || enteredQuantity <= 0)
-    {
+            if (string.IsNullOrEmpty(textBox1.Text) || !int.TryParse(textBox1.Text, out int enteredQuantity) || enteredQuantity <= 0)
+            {
                 MessageBox.Show("يرجى إدخال كمية صحيحة وموجبة!", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -148,7 +167,22 @@ namespace StoreInventoryDBSystem
                 }
             }
         }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void combsuppliers_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
-    }
+}
 
 
