@@ -225,7 +225,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(247, 13);
+            button1.Location = new Point(21, 2);
             button1.Margin = new Padding(3, 4, 3, 4);
             button1.Name = "button1";
             button1.Size = new Size(133, 29);
