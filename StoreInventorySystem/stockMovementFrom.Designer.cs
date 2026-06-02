@@ -1,4 +1,4 @@
-﻿namespace StoreInventorySystem
+﻿namespace StoreInventoryDBSystem
 {
     partial class stockMovementFrom
     {

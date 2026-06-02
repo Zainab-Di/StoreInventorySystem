@@ -1,4 +1,4 @@
-namespace StoreInventorySystem
+namespace StoreInventoryDBSystem
 {
     internal static class Program
     {

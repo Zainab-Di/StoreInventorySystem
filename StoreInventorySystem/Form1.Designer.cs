@@ -1,4 +1,4 @@
-﻿namespace StoreInventorySystem
+﻿namespace StoreInventoryDBSystem
 {
     partial class MainForm
     {
@@ -143,7 +143,7 @@
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 18F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label3.ForeColor = Color.White;
-            label3.Image = Properties.Resources.box;
+          //  label3.Image = Properties.Resources.box;
             label3.ImageAlign = ContentAlignment.MiddleLeft;
             label3.Location = new Point(9, 11);
             label3.Name = "label3";

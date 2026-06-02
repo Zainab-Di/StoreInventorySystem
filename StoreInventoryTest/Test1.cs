@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace StoreInventoryTest
+namespace StoreInventoryDBTest
 {
     [TestClass] // هذه الإشارة التي تجعل الفيجوال ستوديو يتعرف على الكلاس كملف اختبار
     public class StockMovementTests

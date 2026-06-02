@@ -8,12 +8,12 @@ using System.Text;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
-namespace StoreInventorySystem
+namespace StoreInventoryDBSystem
 {
     public partial class stockMovementFrom : Form
     {
         // سلسلة الاتصال بالسيرفر المحلي الخاص بكِ
-        private string connectionString = "Server=.; Database=StoreInventoryDB; Trusted_Connection=True;";
+        private string connectionString = @"Server=DESKTOP-IR0K6JE\SQLEXPRESS;Database=StoreInventoryDB;Trusted_Connection=True;TrustServerCertificate=True;Encrypt=false;";
         public stockMovementFrom()
         {
             InitializeComponent();
