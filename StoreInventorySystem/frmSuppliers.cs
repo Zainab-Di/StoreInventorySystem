@@ -8,17 +8,16 @@ namespace StoreInventorySystem
 {
     public partial class frmSuppliers : Form
     {
-        // سلسلة الاتصال المباشرة بسيرفر ريان وقاعدتها الحالية
-        private string connectionString = @"Server=.;Database=StoreInventoryDB;Trusted_Connection=True;TrustServerCertificate=True;Encrypt=false;";
         public frmSuppliers()
         {
             InitializeComponent();
         }
 
-        // دالة جلب وقراءة بيانات الموردين من القاعدة للجدول
+        // 1. دالة جلب وقراءة بيانات الموردين 
         private void LoadSuppliers()
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            // Code Reuse: استدعاء الاتصال المركزي 
+            using (SqlConnection conn = StoreInventoryDBSystem.DatabaseHelper.GetConnection())
             {
                 try
                 {
@@ -38,28 +37,28 @@ namespace StoreInventorySystem
         private void frmSuppliers_Load(object sender, EventArgs e)
         {
             LoadSuppliers();
-            // تغيير النص الظاهر فقط في أعلى الجدول للمستخدم
-            dgvSuppliers.Columns["SupplierID"].HeaderText = "المعرف";
-            dgvSuppliers.Columns["SupplierName"].HeaderText = "اسم المورد";
-            dgvSuppliers.Columns["ContactPhone"].HeaderText = "رقم الهاتف";
-            dgvSuppliers.Columns["Email"].HeaderText = "البريد الإلكتروني";
-            dgvSuppliers.Columns["Address"].HeaderText = "العنوان";
+
+            // تخصيص أسماء الأعمدة للمستخدم
+            if (dgvSuppliers.Columns["SupplierID"] != null) dgvSuppliers.Columns["SupplierID"].HeaderText = "المعرف";
+            if (dgvSuppliers.Columns["SupplierName"] != null) dgvSuppliers.Columns["SupplierName"].HeaderText = "اسم المورد";
+            if (dgvSuppliers.Columns["ContactPhone"] != null) dgvSuppliers.Columns["ContactPhone"].HeaderText = "رقم الهاتف";
+            if (dgvSuppliers.Columns["Email"] != null) dgvSuppliers.Columns["Email"].HeaderText = "البريد الإلكتروني";
+            if (dgvSuppliers.Columns["Address"] != null) dgvSuppliers.Columns["Address"].HeaderText = "العنوان";
         }
 
-        // كود زر الحفظ (Save)
+        // 2. كود زر الحفظ (Save) بعد عمل Refactoring لتنظيفه
         private void btnSave_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtName.Text) || string.IsNullOrWhiteSpace(txtPhone.Text))
             {
-                MessageBox.Show("الرجاء تعبئة اسم المورد ورقم الهاتف");
+                MessageBox.Show(" الرجاء تعبئة جميع البيانات");
                 return;
             }
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = StoreInventoryDBSystem.DatabaseHelper.GetConnection())
             {
                 try
                 {
-                    conn.Open();
                     string query = "INSERT INTO Suppliers (SupplierName, ContactPhone, Email, Address) VALUES (@name, @phone, @email, @address)";
                     SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -68,16 +67,12 @@ namespace StoreInventorySystem
                     cmd.Parameters.AddWithValue("@email", txtEmail.Text);
                     cmd.Parameters.AddWithValue("@address", txtAddress.Text);
 
+                    conn.Open();
                     cmd.ExecuteNonQuery();
 
                     MessageBox.Show("تم حفظ المورد بنجاح!");
-
                     LoadSuppliers();
-
-                    txtName.Clear();
-                    txtPhone.Clear();
-                    txtEmail.Clear();
-                    txtAddress.Clear();
+                    ClearFormFields(); // الالتزام بـ Clean Code عبر استدعاء دالة المسح
                 }
                 catch (Exception ex)
                 {
@@ -86,7 +81,7 @@ namespace StoreInventorySystem
             }
         }
 
-        // كود الضغط على صف داخل الجدول لعرض البيانات في الخانات
+        // كود الضغط على صف داخل الجدول لعرض البيانات في الخانات (بقي كما هو لسلامته)
         private void dgvSuppliers_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
@@ -99,14 +94,13 @@ namespace StoreInventorySystem
                 txtAddress.Text = row.Cells["Address"].Value?.ToString() ?? "";
             }
         }
-
-        // كود زر التعديل (Update)
         private void btnUpdate_Click(object sender, EventArgs e)
         {
             if (dgvSuppliers.CurrentRow == null) return;
+
             int id = Convert.ToInt32(dgvSuppliers.CurrentRow.Cells["SupplierID"].Value);
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = StoreInventoryDBSystem.DatabaseHelper.GetConnection())
             {
                 try
                 {
@@ -130,7 +124,7 @@ namespace StoreInventorySystem
             }
         }
 
-        // كود زر الحذف (Delete)
+        // 4. كود زر الحذف (Delete) 
         private void btnDelete_Click(object sender, EventArgs e)
         {
             if (dgvSuppliers.CurrentRow == null) return;
@@ -138,7 +132,7 @@ namespace StoreInventorySystem
 
             if (MessageBox.Show("هل أنت متأكد من حذف هذا المورد؟", "تأكيد", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlConnection conn = StoreInventoryDBSystem.DatabaseHelper.GetConnection())
                 {
                     try
                     {
@@ -148,7 +142,9 @@ namespace StoreInventorySystem
 
                         conn.Open();
                         cmd.ExecuteNonQuery();
+                        MessageBox.Show("تم الحذف بنجاح!");
                         LoadSuppliers();
+                        ClearFormFields();
                     }
                     catch (Exception ex)
                     {
@@ -158,60 +154,42 @@ namespace StoreInventorySystem
             }
         }
 
-        // كود زر التحديث وتفريغ الخانات (Refresh)
+        // 5. زر التحديث وإعادة الضبط (تفريغ الخانات)
         private void btnRefresh_Click(object sender, EventArgs e)
         {
-            txtName.Clear();
-            txtPhone.Clear();
-            txtEmail.Clear();
-            txtAddress.Clear();
+            ClearFormFields();
             if (dgvSuppliers.DataSource != null)
             {
                 dgvSuppliers.ClearSelection();
             }
         }
 
+        // 6. زر العودة للشاشة الرئيسية
         private void button1_Click(object sender, EventArgs e)
         {
-            // 1. إغلاق شاشة حركة المخزن الحالية
             this.Close();
-
-            // 2. إظهار الشاشة الرئيسية القديمة مجدداً
-            // (الفيجوال ستوديو سيتعرف تلقائياً على الفورم المفتوح في الخلفية ويظهره)
             if (Application.OpenForms["MainForm"] != null)
             {
                 Application.OpenForms["MainForm"].Show();
             }
         }
 
-        private void label2_Click(object sender, EventArgs e)
+        // Refactoring (Extract Method): دالة موحدة لتفريغ الحقول لمنع تكرار الأسطر 
+        private void ClearFormFields()
         {
-
+            txtName.Clear();
+            txtPhone.Clear();
+            txtEmail.Clear();
+            txtAddress.Clear();
         }
 
-        private void groupBox1_Enter(object sender, EventArgs e)
-        {
 
-        }
-
-        private void dgvSuppliers_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void txtPhone_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void gbDetails_Enter(object sender, EventArgs e)
-        {
-
-        }
+        private void label2_Click(object sender, EventArgs e) { }
+        private void groupBox1_Enter(object sender, EventArgs e) { }
+        private void dgvSuppliers_CellContentClick(object sender, DataGridViewCellEventArgs e) { }
+        private void label1_Click(object sender, EventArgs e) { }
+        private void txtPhone_TextChanged(object sender, EventArgs e) { }
+        private void gbDetails_Enter(object sender, EventArgs e) { }
     }
 }
+

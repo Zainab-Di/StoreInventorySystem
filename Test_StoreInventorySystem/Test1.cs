@@ -1,47 +1,84 @@
-﻿
-  using Microsoft.VisualStudio.TestTools.UnitTesting;
-  using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
 
-    namespace Test_StoreInventorySystem
+namespace Test_StoreInventorySystem
+{
+    [TestClass] // كلاس اختبار منطق والتحقق من الواجهات (UI Logic & Validation Testing)
+    public class FormValidationTests
     {
-  
+        // ==========================================
+        // القسم الأول: اختبارات واجهة المنتجات (ProductsForm)
+        // ==========================================
 
-        [TestClass] // وسم من المنهج يعرّف الفيجوال ستوديو أن هذا كلاس اختبار
-        public class ProductTests
+        [TestMethod]
+        public void Test_UI_StockWarning_WhenBelowMinimum()
         {
-            [TestMethod] // وسم يعرّف أن هذه دالة اختبار محددة (Page 12)
-            public void Test_CheckQuantityLimit()
-            {
-                // تطبيق قاعدة الـ AAA المشهورة في التست (Arrange, Act, Assert) حسب المنهج
+            // 1. Arrange (محاكاة المدخلات داخل صناديق النصوص في الواجهة)
+            int txtCurrentStock_Value = 5;
+            int lblMinimumRequired_Value = 10;
+            bool expectedUIWarning = true;
 
-                // 1. Arrange (تجهيز البيانات والنتيجة المتوقعة)
-                int currentQuantity = 5;       // الكمية الحالية في المخزن
-                int minimumRequired = 10;      // الحد الأدنى المطلوب للمنتج
-                bool expectedResult = true;    // نتوقع أن تكون النتيجة True (الكمية ناقصة تحت الحد)
+            // 2. Act (العملية المنطقية التي تحدث في الخلفية)
+            bool actualUIWarning = txtCurrentStock_Value < lblMinimumRequired_Value;
 
-                // 2. Act (تنفيذ العملية المنطقية المراد اختبارها)
-                bool actualResult = currentQuantity < minimumRequired;
-
-                // 3. Assert (التحقق الفعلي بمطابقة النتيجة المتوقعة مع الحقيقية)
-                Assert.AreEqual(expectedResult, actualResult);
-            }
-
-        [TestMethod] // وسم دالة الاختبار الثانية من المنهج
-        public void Test_ProductExistsAndIsNotEmpty()
-        {
-            // 1. Arrange (تجهيز بيانات الاختبار)
-            string productNameFromDatabase = "شاشه حاسوب";
-            string searchInput = "شاشه حاسوب";
-            bool expectedResult = true; // نتوقع أن يجد النظام تطابقاً كلياً
-
-            // 2. Act (العملية المنطقية المراد اختبارها)
-            // نتحقق أن الخانة ليست فارغة وأن اسم المنتج يطابق المدخلات تماماً
-            bool actualResult = !string.IsNullOrEmpty(searchInput) && (productNameFromDatabase == searchInput);
-
-            // 3. Assert (التحقق الفعلي بمطابقة النتيجة)
-            Assert.AreEqual(expectedResult, actualResult);
+            // 3. Assert
+            Assert.AreEqual(expectedUIWarning, actualUIWarning);
         }
 
-    }
+        [TestMethod]
+        public void Test_UI_ButtonSave_Validation_ShouldAcceptCorrectInput()
+        {
+            // 1. Arrange
+            string txtProductName_Text = "شاشه حاسوب";
+            string txtSearchInput_Text = "شاشه حاسوب";
+            bool expectedValidationResult = true;
 
+            // 2. Act
+            bool actualValidationResult = !string.IsNullOrEmpty(txtSearchInput_Text) && (txtProductName_Text == txtSearchInput_Text);
+
+            // 3. Assert
+            Assert.AreEqual(expectedValidationResult, actualValidationResult);
+        }
+
+        [TestMethod] //   اختبار منع تكرار كود المنتج في الواجهة
+        public void Test_UI_ProductForm_ShouldRejectDuplicateProductCode()
+        {
+            // 1. Arrange 
+            // محاكاة قائمة بـأكواد المنتجات الموجودة مسبقاً في جدول الواجهة
+            List<string> existingProductCodesInGrid = new List<string> { "P001", "P002", "P003" };
+
+            string txtProductCode_Input = "P001";
+            bool expectedRejectionResult = true; // نتوقع أن ترفض الواجهة هذا الكود لأنه مستعمل
+
+            // 2. Act
+            // الواجهة تفحص برمجياً إذا كان الكود المكتوب موجوداً مسبقاً في القائمة
+            bool actualRejectionResult = existingProductCodesInGrid.Contains(txtProductCode_Input);
+
+            // 3. Assert (التأكد من نجاح الواجهة في كشف التكرار ومنع الخطأ)
+            Assert.AreEqual(expectedRejectionResult, actualRejectionResult);
+        }
+
+
+        // ==========================================
+        // القسم الثاني: اختبارات واجهة الموردين (frmSuppliers)
+        // ==========================================
+
+        [TestMethod] //   اختبار التحقق من الحقول الإلزامية للموردين
+        public void Test_UI_SupplierForm_SaveButton_ShouldFailWhenFieldsAreEmpty()
+        {
+            // 1. Arrange
+            // محاكاة ترك المستخدم لصناديق النصوص (txtName) و (txtPhone) فارغة بالخطأ في الواجهة
+            string txtSupplierName_Text = "";
+            string txtContactPhone_Text = "   "; // مسافات فارغة
+            bool expectedValidationError = true; // نتوقع أن تكتشف الواجهة الفراغ وتظهر رسالة تحذير
+
+            // 2. Act
+            // المحاكاة البرمجية لشرط الواجهة (string.IsNullOrWhiteSpace) لرفض البيانات الفارغة
+            bool actualValidationError = string.IsNullOrWhiteSpace(txtSupplierName_Text) || string.IsNullOrWhiteSpace(txtContactPhone_Text);
+
+            // 3. Assert (التأكد من أن الواجهة ستحمي قاعدة البيانات وتمنع الحفظ الفارغ)
+            Assert.AreEqual(expectedValidationError, actualValidationError);
+        }
     }
+}

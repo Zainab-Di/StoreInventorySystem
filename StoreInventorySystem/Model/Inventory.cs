@@ -7,7 +7,13 @@ namespace StoreInventorySystem.Model
     public class Inventory
     {
         private List<Product> products = new List<Product>();
-        private List<InventoryTransaction> transactions = new List<InventoryTransaction>();
+        private readonly ITransactionLogger _transactionLogger;
+
+        // تطبيق مبدأ DIP: نمرر الانترفيس عبر المشيد (Constructor Injection)
+        public Inventory(ITransactionLogger transactionLogger)
+        {
+            _transactionLogger = transactionLogger ?? throw new ArgumentNullException(nameof(transactionLogger));
+        }
 
         public void AddProduct(Product p)
         {
@@ -15,22 +21,24 @@ namespace StoreInventorySystem.Model
                 throw new ArgumentNullException("المنتج لا يمكن أن يكون فارغاً.");
 
             products.Add(p);
-            transactions.Add(new InventoryTransaction(p.Name, p.Quantity, "إضافة"));
+            _transactionLogger.LogTransaction(p.Name, p.Quantity, "إضافة");
         }
 
         public void RemoveProduct(string name)
         {
-            var product = products.FirstOrDefault(p => p.Name == name);
+            // Refactoring: استدعاء الدالة بدلاً من تكرار سطر الـ LINQ (Lecture 1)
+            var product = SearchProduct(name);
             if (product == null)
                 throw new ArgumentException("المنتج غير موجود في المخزون.");
 
             products.Remove(product);
-            transactions.Add(new InventoryTransaction(name, -product.Quantity, "حذف"));
+            _transactionLogger.LogTransaction(name, -product.Quantity, "حذف");
         }
 
         public void UpdateQuantity(string name, int newQuantity)
         {
-            var product = products.FirstOrDefault(p => p.Name == name);
+            // Refactoring: منع تكرار الكود (Code Reuse)
+            var product = SearchProduct(name);
             if (product == null)
                 throw new ArgumentException("المنتج غير موجود في المخزون.");
 
@@ -39,7 +47,7 @@ namespace StoreInventorySystem.Model
 
             int diff = newQuantity - product.Quantity;
             product.Quantity = newQuantity;
-            transactions.Add(new InventoryTransaction(name, diff, "تحديث كمية"));
+            _transactionLogger.LogTransaction(name, diff, "تحديث كمية");
         }
 
         public Product SearchProduct(string name)
@@ -52,14 +60,15 @@ namespace StoreInventorySystem.Model
             return products.Sum(p => p.CalculateTotalValue());
         }
 
-        public List<Product> GetAllProducts()
+        // حماية البيانات (Encapsulation) لمنع واجهة المستخدم من التعديل المباشر
+        public IReadOnlyList<Product> GetAllProducts()
         {
-            return products;
+            return products.AsReadOnly();
         }
 
-        public List<InventoryTransaction> GetAllTransactions()
+        public IReadOnlyList<InventoryTransaction> GetAllTransactions()
         {
-            return transactions;
+            return _transactionLogger.GetAllTransactions();
         }
     }
 }

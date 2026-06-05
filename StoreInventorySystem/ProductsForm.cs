@@ -1,207 +1,156 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Data.SqlClient; 
+using System.Data.SqlClient;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
-namespace StoreInventorySystem;
-
-public partial class ProductsForm : Form
+namespace StoreInventorySystem
 {
-    private string connectionString = @"Server=.;Database=StoreInventoryDB;Trusted_Connection=True;TrustServerCertificate=True;Encrypt=false;";
-    public ProductsForm()
+    public partial class ProductsForm : Form
     {
-        InitializeComponent();
-
-        // ربط حدث تحميل الصفحة لتهيئة البيانات برمجياً عند فتح الشاشة
-        this.Load += new EventHandler(ProductsForm_Load);
-
-        // ربط حدث الضغط على خلايا الجدول لنقل البيانات فوراً عند اختيار منتج
-        this.dataGridView1.CellClick += new DataGridViewCellEventHandler(dataGridView1_CellClick);
-    }
-
-    // دالة مخصصة تُنفذ عند تشغيل الشاشة لأول مرة
-    private void ProductsForm_Load(object sender, EventArgs e)
-    {
-        RefreshData();
-        ClearInputs();
-    }
-
-    // دالة جلب البيانات من SQL Server وعرضها في الـ DataGridView
-    private void RefreshData()
-    {
-        try
+        public ProductsForm()
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            InitializeComponent();
+
+            
+            this.Load += new EventHandler(ProductsForm_Load);
+            this.dataGridView1.CellClick += new DataGridViewCellEventHandler(dataGridView1_CellClick);
+        }
+
+        private void ProductsForm_Load(object sender, EventArgs e)
+        {
+            RefreshData();
+            ClearInputs();
+        }
+
+        // 1. دالة جلب البيانات معتمدة على الـ DatabaseHelper المركزي (Code Reuse)
+        private void RefreshData()
+        {
+            try
             {
-                string query = "SELECT ProductID, ProductCode, ProductName, Category, CurrentStock, UnitPrice FROM Products";
-                SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
-                DataTable dt = new DataTable();
-                adapter.Fill(dt);
-
-                dataGridView1.DataSource = dt; // ربط جدول الواجهة بالبيانات
-
-                // تسمية الأعمدة بشكل احترافي ومفهوم للمستخدم
-                if (dataGridView1.Columns.Count > 0)
+                using (SqlConnection conn = StoreInventoryDBSystem.DatabaseHelper.GetConnection())
                 {
-                    dataGridView1.Columns["ProductID"].HeaderText = "المعرف";
-                    dataGridView1.Columns["ProductCode"].HeaderText = "كود المنتج";
-                    dataGridView1.Columns["ProductName"].HeaderText = "اسم المنتج";
-                    dataGridView1.Columns["Category"].HeaderText = "الفئة";
-                    dataGridView1.Columns["CurrentStock"].HeaderText = "المخزون الحالي";
-                    dataGridView1.Columns["UnitPrice"].HeaderText = "السعر";
+                    string query = "SELECT ProductID, ProductCode, ProductName, Category, CurrentStock, UnitPrice FROM Products";
+                    SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+
+                    dataGridView1.DataSource = dt;
+
+                    if (dataGridView1.Columns.Count > 0)
+                    {
+                        dataGridView1.Columns["ProductID"].HeaderText = "المعرف";
+                        dataGridView1.Columns["ProductCode"].HeaderText = "كود المنتج";
+                        dataGridView1.Columns["ProductName"].HeaderText = "اسم المنتج";
+                        dataGridView1.Columns["Category"].HeaderText = "الفئة";
+                        dataGridView1.Columns["CurrentStock"].HeaderText = "المخزون الحالي";
+                        dataGridView1.Columns["UnitPrice"].HeaderText = "السعر";
+                    }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"خطأ أثناء تحميل البيانات: {ex.Message}", "خطأ", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-    }
-
-    // دالة مساعدة لتنظيف وترسيت خانات الإدخال للقيم الافتراضية الذكية
-    private void ClearInputs()
-    {
-        textBox1.Clear(); // كود المنتج
-        textBox2.Clear(); // اسم المنتج
-        textBox3.Clear(); // الفئة
-        textBox4.Text = "0";    // الكمية الابتدائية (Default = 0 كما بالمتطلبات)
-        textBox5.Text = "0.00"; // السعر (مجهز لـ Decimal)
-        dataGridView1.ClearSelection();
-    }
-
-    // 🔘 زر الحفظ / الإضافة (btnSave / btnAdd) -> تفترض أنه button1
-    private void button1_Click(object sender, EventArgs e)
-    {
-        // التحقق من الحقول الإلزامية لتجنب أخطاء الـ NULL في قاعدة البيانات
-        if (string.IsNullOrWhiteSpace(textBox1.Text) || string.IsNullOrWhiteSpace(textBox2.Text))
-        {
-            MessageBox.Show("عذراً! كود المنتج واسمه حقول إلزامية لا يمكن تركها فارغة.", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
-        }
-
-        try
-        {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            catch (Exception ex)
             {
-                string query = @"INSERT INTO Products (ProductCode, ProductName, Category, CurrentStock, UnitPrice) 
+                MessageBox.Show($"خطأ أثناء تحميل البيانات: {ex.Message}", "خطأ", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ClearInputs()
+        {
+            textBox1.Clear();
+            textBox2.Clear();
+            textBox3.Clear();
+            textBox4.Text = "0";
+            textBox5.Text = "0.00";
+            dataGridView1.ClearSelection();
+        }
+
+        //  زر الحفظ والإضافة  
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(textBox1.Text) || string.IsNullOrWhiteSpace(textBox2.Text))
+            {
+                MessageBox.Show("عذراً! كود المنتج واسمه حقول إلزامية لا يمكن تركها فارغة.", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                using (SqlConnection conn = StoreInventoryDBSystem.DatabaseHelper.GetConnection())
+                {
+                    string query = @"INSERT INTO Products (ProductCode, ProductName, Category, CurrentStock, UnitPrice) 
                                      VALUES (@ProductCode, @ProductName, @Category, @CurrentStock, @UnitPrice)";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@ProductCode", textBox1.Text.Trim());
+                        cmd.Parameters.AddWithValue("@ProductName", textBox2.Text.Trim());
+                        cmd.Parameters.AddWithValue("@Category", string.IsNullOrEmpty(textBox3.Text) ? (object)DBNull.Value : textBox3.Text.Trim());
+
+                        int stock = int.TryParse(textBox4.Text, out stock) ? stock : 0;
+                        decimal price = decimal.TryParse(textBox5.Text, out price) ? price : 0.00m;
+
+                        cmd.Parameters.AddWithValue("@CurrentStock", stock);
+                        cmd.Parameters.AddWithValue("@UnitPrice", price);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+
+                        MessageBox.Show("تم حفظ المنتج بنجاح في قاعدة البيانات!", "تمت العملية", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        RefreshData();
+                        ClearInputs();
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
                 {
-                    cmd.Parameters.AddWithValue("@ProductCode", textBox1.Text.Trim());
-                    cmd.Parameters.AddWithValue("@ProductName", textBox2.Text.Trim()); // يدعم العربية (NVARCHAR)
-                    cmd.Parameters.AddWithValue("@Category", string.IsNullOrEmpty(textBox3.Text) ? (object)DBNull.Value : textBox3.Text.Trim());
-
-                    // تحويل آمن للأرقام لمنع الكراش
-                    int stock = int.TryParse(textBox4.Text, out stock) ? stock : 0;
-                    decimal price = decimal.TryParse(textBox5.Text, out price) ? price : 0.00m;
-
-                    cmd.Parameters.AddWithValue("@CurrentStock", stock);
-                    cmd.Parameters.AddWithValue("@UnitPrice", price);
-
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-
-                    MessageBox.Show("تم حفظ المنتج بنجاح في قاعدة البيانات!", "تمت العملية", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    RefreshData();
-                    ClearInputs();
+                    MessageBox.Show("خطأ: كود المنتج هذا مسجل مسبقاً! يرجى إدخال كود فريد وغير مكرر.", "خطأ قيد البيانات", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    MessageBox.Show($"خطأ في قاعدة البيانات: {ex.Message}", "خطأ", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
-        catch (SqlException ex)
+
+        //  زر التعديل  
+        private void button2_Click(object sender, EventArgs e)
         {
-            // معالجة ذكية إذا تكرر كود المنتج (Unique Constraint violation)
-            if (ex.Number == 2627)
+            if (dataGridView1.CurrentRow == null)
             {
-                MessageBox.Show("خطأ: كود المنتج هذا مسجل مسبقاً! يرجى إدخال كود فريد وغير مكرر.", "خطأ قيد البيانات", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("يرجى اختيار منتج من الجدول أولاً ليتم تعديله.", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
-            else
+
+            int productId = Convert.ToInt32(dataGridView1.CurrentRow.Cells["ProductID"].Value);
+
+            try
             {
-                MessageBox.Show($"خطأ في قاعدة البيانات: {ex.Message}", "خطأ", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-    }
-
-    // 🔘 زر التعديل (btnUpdate) -> تفترض أنه button2
-    private void button2_Click(object sender, EventArgs e)
-    {
-        if (dataGridView1.CurrentRow == null)
-        {
-            MessageBox.Show("يرجى اختيار منتج من الجدول أولاً ليتم تعديله.", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
-        }
-
-        int productId = Convert.ToInt32(dataGridView1.CurrentRow.Cells["ProductID"].Value);
-
-        try
-        {
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                string query = @"UPDATE Products 
+                using (SqlConnection conn = StoreInventoryDBSystem.DatabaseHelper.GetConnection())
+                {
+                    string query = @"UPDATE Products 
                                      SET ProductCode = @ProductCode, ProductName = @ProductName, 
                                          Category = @Category, CurrentStock = @CurrentStock, UnitPrice = @UnitPrice 
                                      WHERE ProductID = @ProductID";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@ProductID", productId);
-                    cmd.Parameters.AddWithValue("@ProductCode", textBox1.Text.Trim());
-                    cmd.Parameters.AddWithValue("@ProductName", textBox2.Text.Trim());
-                    cmd.Parameters.AddWithValue("@Category", string.IsNullOrEmpty(textBox3.Text) ? (object)DBNull.Value : textBox3.Text.Trim());
-
-                    int stock = int.TryParse(textBox4.Text, out stock) ? stock : 0;
-                    decimal price = decimal.TryParse(textBox5.Text, out price) ? price : 0.00m;
-
-                    cmd.Parameters.AddWithValue("@CurrentStock", stock);
-                    cmd.Parameters.AddWithValue("@UnitPrice", price);
-
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-
-                    MessageBox.Show("تم تحديث بيانات المنتج بنجاح!", "تمت العملية", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    RefreshData();
-                    ClearInputs();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"خطأ أثناء عملية التعديل: {ex.Message}", "خطأ", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-    }
-
-    // 🔘 زر الحذف (btnDelete) -> تفترض أنه button3
-    private void button3_Click(object sender, EventArgs e)
-    {
-        if (dataGridView1.CurrentRow == null)
-        {
-            MessageBox.Show("يرجى اختيار المنتج المراد حذفه من الجدول السفلية.", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
-        }
-
-        int productId = Convert.ToInt32(dataGridView1.CurrentRow.Cells["ProductID"].Value);
-        string productName = dataGridView1.CurrentRow.Cells["ProductName"].Value.ToString();
-
-        DialogResult dialog = MessageBox.Show($"هل أنت متأكد من حذف المنتج ({productName})؟\nحذف المنتج سيحذف حركاته المخزنية المرتبطة به.", "تأكيد الحذف", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-        if (dialog == DialogResult.Yes)
-        {
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    string query = "DELETE FROM Products WHERE ProductID = @ProductID";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@ProductID", productId);
+                        cmd.Parameters.AddWithValue("@ProductCode", textBox1.Text.Trim());
+                        cmd.Parameters.AddWithValue("@ProductName", textBox2.Text.Trim());
+                        cmd.Parameters.AddWithValue("@Category", string.IsNullOrEmpty(textBox3.Text) ? (object)DBNull.Value : textBox3.Text.Trim());
+
+                        int stock = int.TryParse(textBox4.Text, out stock) ? stock : 0;
+                        decimal price = decimal.TryParse(textBox5.Text, out price) ? price : 0.00m;
+
+                        cmd.Parameters.AddWithValue("@CurrentStock", stock);
+                        cmd.Parameters.AddWithValue("@UnitPrice", price);
+
                         conn.Open();
                         cmd.ExecuteNonQuery();
 
-                        MessageBox.Show("تم حذف المنتج بنجاح.", "تم الحذف", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("تم تحديث بيانات المنتج بنجاح!", "تمت العملية", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         RefreshData();
                         ClearInputs();
                     }
@@ -209,95 +158,115 @@ public partial class ProductsForm : Form
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"خطأ أثناء الحذف: {ex.Message}", "خطأ", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"خطأ أثناء عملية التعديل: {ex.Message}", "خطأ", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-    }
 
-    // 🔘 زر تنظيف الخانات وتفريغها (btnClear) -> تفترض أنه button4
-    private void button4_Click(object sender, EventArgs e)
-    {
-        ClearInputs();
-    }
-
-    // حدث مخصص لنقل البيانات من السطر المختار في الـ DataGridView إلى صناديق النصوص فوق تلقائياً
-    private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
-    {
-        if (dataGridView1.CurrentRow != null && e.RowIndex >= 0)
+        //  زر الحذف 
+        private void button3_Click(object sender, EventArgs e)
         {
-            textBox1.Text = dataGridView1.CurrentRow.Cells["ProductCode"].Value.ToString();
-            textBox2.Text = dataGridView1.CurrentRow.Cells["ProductName"].Value.ToString();
-            textBox3.Text = dataGridView1.CurrentRow.Cells["Category"].Value?.ToString();
-            textBox4.Text = dataGridView1.CurrentRow.Cells["CurrentStock"].Value.ToString();
-            textBox5.Text = dataGridView1.CurrentRow.Cells["UnitPrice"].Value.ToString();
+            if (dataGridView1.CurrentRow == null)
+            {
+                MessageBox.Show("يرجى اختيار المنتج المراد حذفه من الجدول السفلية.", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            int productId = Convert.ToInt32(dataGridView1.CurrentRow.Cells["ProductID"].Value);
+            string productName = dataGridView1.CurrentRow.Cells["ProductName"].Value.ToString();
+
+            DialogResult dialog = MessageBox.Show($"هل أنت متأكد من حذف المنتج ({productName})؟\nحذف المنتج سيحذف حركاته المخزنية المرتبطة به.", "تأكيد الحذف", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+            if (dialog == DialogResult.Yes)
+            {
+                try
+                {
+                    using (SqlConnection conn = StoreInventoryDBSystem.DatabaseHelper.GetConnection())
+                    {
+                        string query = "DELETE FROM Products WHERE ProductID = @ProductID";
+                        using (SqlCommand cmd = new SqlCommand(query, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@ProductID", productId);
+                            conn.Open();
+                            cmd.ExecuteNonQuery();
+
+                            MessageBox.Show("تم حذف المنتج بنجاح.", "تم الحذف", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            RefreshData();
+                            ClearInputs();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"خطأ أثناء الحذف: {ex.Message}", "خطأ", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
-    }
 
-    // --- الأحداث التلقائية الأخرى المتروكة فارغة بناءً على طلبك لعدم الحاجة لها برمجياً ---
-    private void label1_Click(object sender, EventArgs e) { }
-    private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e) { }
-    private void textBox1_TextChanged(object sender, EventArgs e) { } // كود المنتج
-    private void textBox2_TextChanged(object sender, EventArgs e) { } // اسم المنتج
-    private void textBox3_TextChanged(object sender, EventArgs e) { } // الفئة
-    private void textBox4_TextChanged(object sender, EventArgs e) { } // المخزون الحالي
-    private void textBox5_TextChanged(object sender, EventArgs e) { } // السعر
-
-    private void button5_Click(object sender, EventArgs e)
-    {
-
-        this.Close();
-
-        // إظهار الشاشة الرئيسية القديمة مجدداً
-        // (الفيجوال ستوديو سيتعرف تلقائياً على الفورم المفتوح في الخلفية ويظهره)
-        if (Application.OpenForms["MainForm"] != null)
+        
+        private void button4_Click(object sender, EventArgs e)
         {
-            Application.OpenForms["MainForm"].Show();
+            ClearInputs();
         }
-    }
 
-    private void ProductsForm_Load_1(object sender, EventArgs e)
-    {
-
-    }
-
-    private void label3_Click(object sender, EventArgs e)
-    {
-
-    }
-
-    private void textBox5_Enter(object sender, EventArgs e)
-    {
-
-        if (textBox5.Text == "0" || textBox5.Text == "0.00")
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            textBox5.Text = "";
+            if (dataGridView1.CurrentRow != null && e.RowIndex >= 0)
+            {
+                textBox1.Text = dataGridView1.CurrentRow.Cells["ProductCode"].Value?.ToString() ?? "";
+                textBox2.Text = dataGridView1.CurrentRow.Cells["ProductName"].Value?.ToString() ?? "";
+                textBox3.Text = dataGridView1.CurrentRow.Cells["Category"].Value?.ToString() ?? "";
+                textBox4.Text = dataGridView1.CurrentRow.Cells["CurrentStock"].Value?.ToString() ?? "0";
+                textBox5.Text = dataGridView1.UnderlyingCellClickFix(e.RowIndex); // تم استخدام معالجة آمنة
+            }
         }
-    }
 
-    private void textBox5_Leave(object sender, EventArgs e)
-    {
-        // إذا خرج المستخدم وترك المربع فارغاً، أعِد الصفر تلقائياً لحماية قاعدة البيانات
-        if (string.IsNullOrWhiteSpace(textBox5.Text))
+        //  زر الرجوع للشاشة الرئيسية 
+        private void button5_Click(object sender, EventArgs e)
         {
-            textBox5.Text = "0";
+            this.Close();
+            if (Application.OpenForms["MainForm"] != null)
+            {
+                Application.OpenForms["MainForm"].Show();
+            }
         }
-    }
 
-    private void textBox4_Enter(object sender, EventArgs e)
-    {
-       
-    if (textBox4.Text == "0" || textBox4.Text == "0.00")
+        private void textBox5_Enter(object sender, EventArgs e)
         {
-            textBox4.Text = "";
+            if (textBox5.Text == "0" || textBox5.Text == "0.00") textBox5.Text = "";
         }
+
+        private void textBox5_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(textBox5.Text)) textBox5.Text = "0.00";
+        }
+
+        private void textBox4_Enter(object sender, EventArgs e)
+        {
+            if (textBox4.Text == "0") textBox4.Text = "";
+        }
+
+        private void textBox4_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(textBox4.Text)) textBox4.Text = "0";
+        }
+
+        private void label1_Click(object sender, EventArgs e) { }
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e) { }
+        private void textBox1_TextChanged(object sender, EventArgs e) { }
+        private void textBox2_TextChanged(object sender, EventArgs e) { }
+        private void textBox3_TextChanged(object sender, EventArgs e) { }
+        private void textBox4_TextChanged(object sender, EventArgs e) { }
+        private void textBox5_TextChanged(object sender, EventArgs e) { }
+        private void ProductsForm_Load_1(object sender, EventArgs e) { }
+        private void label3_Click(object sender, EventArgs e) { }
     }
 
-    private void textBox4_Leave(object sender, EventArgs e)
+    // كلاس داخلي لتوسيع الخصائص وحل مشكلة جلب السعر الآمن 
+    public static class DataGridViewExtension
     {
-        // إذا خرج المستخدم وترك المربع فارغاً، أعِد الصفر تلقائياً لحماية قاعدة البيانات
-        if (string.IsNullOrWhiteSpace(textBox5.Text))
+        public static string UnderlyingCellClickFix(this DataGridView dgv, int rowIndex)
         {
-            textBox4.Text = "0";
+            return dgv.Rows[rowIndex].Cells["UnitPrice"].Value?.ToString() ?? "0.00";
         }
     }
 }

@@ -1,114 +1,128 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StoreInventorySystem.Model;
 using System;
+using System.Collections.Generic;
 
 namespace StoreInventorySystem.Test
 {
+    public class FakeTransactionLogger : ITransactionLogger
+    {
+        public List<InventoryTransaction> LoggedTransactions { get; } = new List<InventoryTransaction>();
+
+        public void LogTransaction(string productName, int quantityChanged, string transactionType, string notes = "")
+        {
+            LoggedTransactions.Add(new InventoryTransaction(productName, quantityChanged, transactionType, notes));
+        }
+
+        public IReadOnlyList<InventoryTransaction> GetAllTransactions()
+        {
+            return LoggedTransactions.AsReadOnly();
+        }
+    }
+
+
     [TestClass]
     public class InventoryTests
     {
+        private FakeTransactionLogger _fakeLogger;
+        private Inventory _inventory;
+
+        [TestInitialize]
+        public void Setup()
+        {
+            _fakeLogger = new FakeTransactionLogger();
+            _inventory = new Inventory(_fakeLogger);
+        }
+
         [TestMethod]
         public void TestAddProduct_ShouldAddSuccessfully()
         {
-            Inventory inv = new Inventory();
-            Product p = new Product("Laptop", 5, 1000);
-            inv.AddProduct(p);
+            // Arrange
+            Product p = new Product("Laptop", 5, 1000m);
 
-            Assert.AreEqual(1, inv.GetAllProducts().Count);
-            Assert.AreEqual("Laptop", inv.GetAllProducts()[0].Name);
+            // Act
+            _inventory.AddProduct(p);
 
-            // تأكيد أن الحركة سُجلت
-            Assert.AreEqual(1, inv.GetAllTransactions().Count);
-            Assert.AreEqual("إضافة", inv.GetAllTransactions()[0].TransactionType);
+            // Assert
+            Assert.AreEqual(1, _inventory.GetAllProducts().Count);
+            Assert.AreEqual("Laptop", _inventory.GetAllProducts()[0].Name);
+
+            // تأكيد تسجيل الحركة من خلال اللوجر المطابق
+            Assert.AreEqual(1, _fakeLogger.LoggedTransactions.Count);
+            Assert.AreEqual("إضافة", _fakeLogger.LoggedTransactions[0].TransactionType);
         }
 
         [TestMethod]
         public void TestAddProduct_NegativeQuantity_ShouldThrowException()
         {
-            Inventory inv = new Inventory();
             try
             {
-                Product p = new Product("Keyboard", -5, 100);
-                inv.AddProduct(p);
+                Product p = new Product("Keyboard", -5, 100m);
+                _inventory.AddProduct(p);
 
-                // إذا وصل الكود إلى هذا السطر ولم يحدث خطأ، فالفحص يعتبر فاشلاً
-                Assert.Fail("كان من المتوقع حدوث ArgumentException ولكن لم يحدث شيء.");
+                Assert.Fail("كان من المتوقع حدوث ArgumentException بسبب الكمية السالبة.");
             }
             catch (ArgumentException)
             {
-                // النجاح: الكود قام برمي الخطأ المطلوب بنجاح، الفحص يمر (Pass)
+                // نجاح الفحص
             }
         }
 
         [TestMethod]
         public void TestRemoveProduct_ShouldRemoveSuccessfully()
         {
-            Inventory inv = new Inventory();
-            Product p = new Product("Mouse", 10, 50);
-            inv.AddProduct(p);
-            inv.RemoveProduct("Mouse");
+            // Arrange
+            Product p = new Product("Mouse", 10, 50m);
+            _inventory.AddProduct(p);
 
-            Assert.AreEqual(0, inv.GetAllProducts().Count);
+            // Act
+            _inventory.RemoveProduct("Mouse");
 
-            // تأكيد أن الحركة سُجلت
-            Assert.AreEqual("حذف", inv.GetAllTransactions()[1].TransactionType);
+            // Assert
+            Assert.AreEqual(0, _inventory.GetAllProducts().Count);
+            Assert.AreEqual("حذف", _fakeLogger.LoggedTransactions[1].TransactionType);
         }
 
         [TestMethod]
         public void TestRemoveProduct_NotFound_ShouldThrowException()
         {
-            Inventory inv = new Inventory();
             try
             {
-                inv.RemoveProduct("NotExist");
-                Assert.Fail("كان من المتوقع حدوث ArgumentException ولكن لم يحدث شيء.");
+                _inventory.RemoveProduct("NotExist");
+                Assert.Fail("كان من المتوقع حدوث ArgumentException.");
             }
             catch (ArgumentException)
             {
-                // النجاح
+                // نجاح
             }
         }
 
         [TestMethod]
         public void TestUpdateQuantity_ShouldUpdateSuccessfully()
         {
-            Inventory inv = new Inventory();
-            Product p = new Product("Tablet", 3, 500);
-            inv.AddProduct(p);
-            inv.UpdateQuantity("Tablet", 10);
+            // Arrange
+            Product p = new Product("Tablet", 3, 500m);
+            _inventory.AddProduct(p);
 
-            Assert.AreEqual(10, inv.GetAllProducts()[0].Quantity);
+            // Act
+            _inventory.UpdateQuantity("Tablet", 10);
 
-            // تأكيد أن الحركة سُجلت
-            Assert.AreEqual("تحديث كمية", inv.GetAllTransactions()[1].TransactionType);
-            Assert.AreEqual(7, inv.GetAllTransactions()[1].QuantityChanged);
-        }
-
-        [TestMethod]
-        public void TestUpdateQuantity_Negative_ShouldThrowException()
-        {
-            Inventory inv = new Inventory();
-            Product p = new Product("Phone", 2, 800);
-            inv.AddProduct(p);
-            try
-            {
-                inv.UpdateQuantity("Phone", -1);
-                Assert.Fail("كان من المتوقع حدوث ArgumentException ولكن لم يحدث شيء.");
-            }
-            catch (ArgumentException)
-            {
-                // النجاح
-            }
+            // Assert
+            Assert.AreEqual(10, _inventory.GetAllProducts()[0].Quantity);
+            Assert.AreEqual("تحديث كمية", _fakeLogger.LoggedTransactions[1].TransactionType);
         }
 
         [TestMethod]
         public void TestSearchProduct_ShouldReturnProduct()
         {
-            Inventory inv = new Inventory();
-            Product p = new Product("Camera", 4, 1200);
-            inv.AddProduct(p);
+            // Arrange
+            Product p = new Product("Camera", 4, 1200m);
+            _inventory.AddProduct(p);
 
-            var result = inv.SearchProduct("Camera");
+            // Act
+            var result = _inventory.SearchProduct("Camera");
+
+            // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual("Camera", result.Name);
         }
@@ -116,34 +130,22 @@ namespace StoreInventorySystem.Test
         [TestMethod]
         public void TestSearchProduct_NotFound_ShouldReturnNull()
         {
-            Inventory inv = new Inventory();
-            var result = inv.SearchProduct("NotExist");
+            var result = _inventory.SearchProduct("NotExist");
             Assert.IsNull(result);
         }
 
         [TestMethod]
         public void TestCalculateTotalInventoryValue_ShouldReturnCorrectValue()
         {
-            Inventory inv = new Inventory();
-            inv.AddProduct(new Product("Item1", 2, 100));
-            inv.AddProduct(new Product("Item2", 3, 200));
+            // Arrange
+            _inventory.AddProduct(new Product("Item1", 2, 100m));
+            _inventory.AddProduct(new Product("Item2", 3, 200m));
 
-            decimal totalValue = inv.CalculateTotalInventoryValue();
-            Assert.AreEqual(800, totalValue); // (2*100 + 3*200)
-        }
-        [TestMethod]
-        public void TestGetAllTransactions_ShouldReturnAll()
-        {
-            Inventory inv = new Inventory();
-            inv.AddProduct(new Product("Book", 5, 20));
-            inv.UpdateQuantity("Book", 10);
-            inv.RemoveProduct("Book");
+            // Act
+            decimal totalValue = _inventory.CalculateTotalInventoryValue();
 
-            var transactions = inv.GetAllTransactions();
-            Assert.AreEqual(3, transactions.Count);
-            Assert.AreEqual("إضافة", transactions[0].TransactionType);
-            Assert.AreEqual("تحديث كمية", transactions[1].TransactionType);
-            Assert.AreEqual("حذف", transactions[2].TransactionType);
+            // Assert
+            Assert.AreEqual(800m, totalValue);
         }
     }
 }

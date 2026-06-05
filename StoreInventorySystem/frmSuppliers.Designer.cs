@@ -182,7 +182,7 @@
             btnRefresh.Name = "btnRefresh";
             btnRefresh.Size = new Size(137, 45);
             btnRefresh.TabIndex = 11;
-            btnRefresh.Text = "تنشيط";
+            btnRefresh.Text = "تنظيف";
             btnRefresh.UseVisualStyleBackColor = false;
             btnRefresh.Click += btnRefresh_Click;
             // 
