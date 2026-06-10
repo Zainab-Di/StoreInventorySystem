@@ -9,6 +9,12 @@ using System.Windows.Forms;
 
 namespace StoreInventoryDBSystem
 {
+    /// <summary>
+    /// SOLID Principles (Lecture 8):
+    /// ملاحظة نقدية للمناقشة: هذه الشاشة تحتوي حالياً على أكواد SQL مباشرة (Tight Coupling).
+    /// وفقاً للمحاضرة الثامنة، يفضل مستقبلاً عزل هذه الأكواد في كلاس منفصل (Data Access Layer) 
+    /// لتحقيق مبدأ المسؤولية الواحدة (SRP) بشكل كامل وفصل واجهة المستخدم عن تفاصيل قاعدة البيانات.
+    /// </summary>
     public partial class stockMovementFrom : Form
     {
         public stockMovementFrom()
@@ -16,7 +22,7 @@ namespace StoreInventoryDBSystem
             InitializeComponent();
         }
 
-        //  زر الرجوع للشاشة الرئيسية
+        // زر الرجوع للشاشة الرئيسية
         private void button1_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -32,11 +38,12 @@ namespace StoreInventoryDBSystem
             LoadSuppliers();
         }
 
-        // تحميل الموردين
+        // تحميل الموردين داخل الـ ComboBox
         private void LoadSuppliers()
         {
             try
-            {
+            { 
+                // لحماية النظام من تسريب البيانات أو الموارد (Memory Leaks).
                 using (SqlConnection conn = DatabaseHelper.GetConnection())
                 {
                     conn.Open();
@@ -56,7 +63,6 @@ namespace StoreInventoryDBSystem
             }
         }
 
-        // دالة تحديث قراءة البيانات المخزنية وعرضها
         private void RefreshData()
         {
             try
@@ -72,19 +78,15 @@ namespace StoreInventoryDBSystem
                     da.Fill(dt);
                     dataGridView1.DataSource = dt;
 
-                    // 2. تعبئة الـ ComboBox بأسماء المنتجات لاختيارها
+                    // 2. تعبئة الـ ComboBox بأسماء المنتجات لاختيارها 
                     string queryCombo = "SELECT ProductID, ProductName FROM Products";
-                    SqlCommand cmd = new SqlCommand(queryCombo, conn);
+                    SqlDataAdapter daCombo = new SqlDataAdapter(queryCombo, conn);
+                    DataTable comboTable = new DataTable();
+                    daCombo.Fill(comboTable);
 
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        DataTable comboTable = new DataTable();
-                        comboTable.Load(reader);
-
-                        comboBox1.DataSource = comboTable;
-                        comboBox1.DisplayMember = "ProductName";
-                        comboBox1.ValueMember = "ProductID";
-                    }
+                    comboBox1.DataSource = comboTable;
+                    comboBox1.DisplayMember = "ProductName";
+                    comboBox1.ValueMember = "ProductID";
                 }
             }
             catch (Exception ex)
@@ -93,11 +95,11 @@ namespace StoreInventoryDBSystem
             }
         }
 
-        //  زر حفظ وتطبيق الحركة المخزنية 
+        // زر حفظ وتطبيق الحركة المخزنية (وارد / صادر)
         private void button2_Click(object sender, EventArgs e)
         {
-
             int enteredQuantity = 0;
+            // التحقق من المدخلات لضمان جودة البيانات ومنع الأخطاء البرمجية المفاجئة
             bool isNumeric = int.TryParse(textBox1.Text.Trim(), out enteredQuantity);
 
             if (string.IsNullOrEmpty(textBox1.Text)||!isNumeric || enteredQuantity <= 0)
@@ -120,6 +122,7 @@ namespace StoreInventoryDBSystem
                 {
                     conn.Open();
 
+                    // فحص الكمية الحالية المتوفرة في المخزن قبل الخصم
                     string checkQuery = "SELECT CurrentStock FROM Products WHERE ProductID = @ID";
                     SqlCommand checkCmd = new SqlCommand(checkQuery, conn);
                     checkCmd.Parameters.AddWithValue("@ID", selectedProductID);
@@ -127,12 +130,14 @@ namespace StoreInventoryDBSystem
 
                     string updateQuery = "";
 
+                    // تحديد نوع العملية بناءً على اختيار المستخدم
                     if (radioButton1.Checked)
                     {
                         updateQuery = "UPDATE Products SET CurrentStock = CurrentStock + @EnteredQty WHERE ProductID = @ID";
                     }
                     else if (radioButton2.Checked)
                     {
+                        // حماية النظام: منع صرف كمية أكبر من المتوفرة في المخزن لضمان سلامة البيانات (Data Integrity)
                         if (enteredQuantity > currentQuantity)
                         {
                             MessageBox.Show($"عذراً، الكمية المطلوبة غير متوفرة! المتوفر حالياً هو ({currentQuantity}) قطع فقط.", "فشل العملية", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -141,6 +146,7 @@ namespace StoreInventoryDBSystem
                         updateQuery = "UPDATE Products SET CurrentStock = CurrentStock - @EnteredQty WHERE ProductID = @ID";
                     }
 
+                    // تنفيذ أمر التحديث في قاعدة البيانات
                     SqlCommand updateCmd = new SqlCommand(updateQuery, conn);
                     updateCmd.Parameters.AddWithValue("@EnteredQty", enteredQuantity);
                     updateCmd.Parameters.AddWithValue("@ID", selectedProductID);
@@ -148,6 +154,7 @@ namespace StoreInventoryDBSystem
 
                     MessageBox.Show("تم تنفيذ حركة المخزن وتحديث الكميات بنجاح!", "نجاح العملية", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+                    // تنظيف الشاشة وتحديث البيانات بعد النجاح
                     textBox1.Clear();
                     RefreshData();
                 }
@@ -158,6 +165,7 @@ namespace StoreInventoryDBSystem
             }
         }
 
+        // أحداث فارغة يمكن تركها أو مسحها لاحقاً حسب تصميم الواجهة
         private void textBox1_TextChanged(object sender, EventArgs e) { }
         private void label1_Click(object sender, EventArgs e) { }
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e) { }

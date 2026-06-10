@@ -5,10 +5,10 @@ namespace StoreInventoryDBSystem
 {
     public class DatabaseHelper
     {
-        // تغيير السلسلة هنا مرة واحدة يطبق على كل المشروع ا
+      
         private static readonly string ConnectionString =
             @"Server=.;Database=StoreInventoryDB;Trusted_Connection=True;TrustServerCertificate=True;Encrypt=false;";
-
+        //إنشاء وارجاع كائن الاتصال بقاعدة البيانات يمكن إعادة استخدامه في أي مكان في المشروع
         public static SqlConnection GetConnection()
         {
             return new SqlConnection(ConnectionString);

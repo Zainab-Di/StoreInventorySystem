@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Test_StoreInventorySystem
 {
-    [TestClass] // كلاس اختبار منطق والتحقق من الواجهات (UI Logic & Validation Testing)
+    [TestClass] // كلاس اختبار منطق والتحقق من الواجهات 
     public class FormValidationTests
     {
         // ==========================================

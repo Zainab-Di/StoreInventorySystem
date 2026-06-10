@@ -10,8 +10,6 @@ namespace StoreInventoryDBSystem
         public MainForm()
         {
             InitializeComponent();
-
-        
             MakeButtonRounded(button1, 25);
             MakeButtonRounded(button2, 25);
             MakeButtonRounded(button3, 25);
@@ -36,21 +34,21 @@ namespace StoreInventoryDBSystem
         private void button1_Click(object sender, EventArgs e)
         {
             ProductsForm form = new ProductsForm();
-            OpenFormDialog(form);
+            OpenFormDialog(form);//إعادة استخدام للدالة
         }
 
         //  الدالة  لزر الموردين
         private void button2_Click(object sender, EventArgs e)
         {
             frmSuppliers form = new frmSuppliers();
-            OpenFormDialog(form);
+            OpenFormDialog(form);//إعادة استخدام للدالة
         }
 
         //  الدالة  لزر حركة المخزن
         private void button3_Click(object sender, EventArgs e)
         {
             stockMovementFrom form = new stockMovementFrom();
-            OpenFormDialog(form);
+            OpenFormDialog(form);//إعادة استخدام للدالة
         }
 
         // دالة موحدة لفتح الشاشات (تمنع تكرار الكود وتسهل الصيانة - Refactoring)
